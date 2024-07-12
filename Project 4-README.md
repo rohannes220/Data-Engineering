@@ -7,7 +7,7 @@ This project involves analyzing car sales and profits for SwiftAuto Traders, a c
 The dataset used in this lab is a modified subset provided specifically for this lab exercise. Ensure you use the dataset provided with the lab instructions.
 
 ### CSV File
-The CSV file used in this project is `service_dashboard_data.csv`. It contains the following columns:
+The CSV file used in this project is `SalesData.csv`. It contains the following columns:
 - **Dealer ID**: Unique identifier for each dealer.
 - **Car Sold**: Model of the car sold.
 - **Quantity Sold**: Total quantity of cars sold.
