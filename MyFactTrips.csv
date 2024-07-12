@@ -1,0 +1,4 @@
+TripID,DateKey,WasteTypeKey,ZoneKey,TruckType,Weight
+1,1,1,1,Truck A,1000.5
+2,2,2,2,Truck B,2000.75
+3,3,3,3,Truck C,1500.0
