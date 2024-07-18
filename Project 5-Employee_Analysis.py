@@ -55,4 +55,9 @@ avg_age_df = employees_df.agg(avg("Age").alias("AverageAge"))
 avg_age_df.show()
 
 # Task 11: Calculate Total Salary by Department
-total_salary_by_department_df = employees_df.groupBy("Department").agg({"Salary": "sum"}).withColumnRenamed("sum
+total_salary_by_department_df = employees_df.groupBy("Department").agg({"Salary": "sum"}).withColumnRenamed("sum(Salary)", "TotalSalary")
+total_salary_by_department_df.show()
+
+# Stop the Spark session
+spark.stop()
+
