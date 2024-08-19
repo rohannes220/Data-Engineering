@@ -1,5 +1,3 @@
-You're right. A README should provide a concise overview and instructions rather than detailed code. Here's a more concise version:
-
 ---
 
 # Data Engineering Capstone Project
