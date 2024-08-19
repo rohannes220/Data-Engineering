@@ -77,6 +77,4 @@ In this module, we create a Business Intelligence dashboard using IBM Cognos Ana
 
 This capstone project covers various aspects of data engineering, including OLTP and NoSQL database management, data warehousing, machine learning, and data visualization using IBM Cognos Analytics. Each module provides a comprehensive understanding and practical application of these skills.
 
----
 
-This version provides a concise overview of each module without going into the specifics of the code, while still giving a clear understanding of what each part of the project entails.
