@@ -2,10 +2,10 @@ import sqlite3
 import pandas as pd
 
 # Read data from CSV files
-mydimdate_df = pd.read_csv('/Users/god/Downloads/MyDimDate.csv')
-mydimwaste_df = pd.read_csv('/Users/god/Downloads/MyDimWaste.csv')
-mydimzone_df = pd.read_csv('/Users/god/Downloads/MyDimZone.csv')
-myfacttrips_df = pd.read_csv('/Users/god/Downloads/MyFactTrips.csv')
+mydimdate_df = pd.read_csv('/Downloads/MyDimDate.csv')
+mydimwaste_df = pd.read_csv('/Downloads/MyDimWaste.csv')
+mydimzone_df = pd.read_csv('/Downloads/MyDimZone.csv')
+myfacttrips_df = pd.read_csv('/Downloads/MyFactTrips.csv')
 
 # Connect to SQLite database
 conn = sqlite3.connect('data_warehouse.db')
