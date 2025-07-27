@@ -1,16 +1,20 @@
 import pandas as pd
 import sqlite3
+import os
 
-# Connect to the database
-con = sqlite3.connect('/Users/god/Desktop/Data Engineering/Database.db')
+# --- Setup relative paths ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, 'data')
+DB_PATH = os.path.join(BASE_DIR, 'Database.db')
+
+# --- Connect to SQLite database ---
+con = sqlite3.connect(DB_PATH)
 cursor = con.cursor()
 
-# Task 1: Load data into the DimDate table
-dimdate_path = "/Users/god/Downloads/DimDate.csv"
+# --- Task 1: Load DimDate ---
+dimdate_path = os.path.join(DATA_DIR, "DimDate.csv")
 DimDate_df = pd.read_csv(dimdate_path)
-
-# Create the DimDate table if it doesn't exist
-create_dimdate_query = '''
+cursor.execute('''
 CREATE TABLE IF NOT EXISTS DimDate (
     DateKey INTEGER PRIMARY KEY,
     Date TEXT,
@@ -19,74 +23,41 @@ CREATE TABLE IF NOT EXISTS DimDate (
     Year INTEGER,
     Quarter INTEGER
 )
-'''
-cursor.execute(create_dimdate_query)
-
-# Insert data into DimDate table
+''')
 DimDate_df.to_sql("DimDate", con, if_exists='replace', index=False)
+cursor.execute("SELECT * FROM DimDate LIMIT 5")
+print("First 5 rows in DimDate:", cursor.fetchall())
 
-# Query: Retrieve first 5 rows from DimDate
-query = "SELECT * FROM DimDate LIMIT 5"
-cursor.execute(query)
-dimdate_rows = cursor.fetchall()
-print("First 5 rows in DimDate:")
-for row in dimdate_rows:
-    print(row)
-
-# Task 2: Load data into the DimCategory table
-dimcategory_path = "/Users/god/Downloads/DimCategory.csv"
+# --- Task 2: Load DimCategory ---
+dimcategory_path = os.path.join(DATA_DIR, "DimCategory.csv")
 DimCategory_df = pd.read_csv(dimcategory_path)
-
-# Create the DimCategory table if it doesn't exist
-create_dimcategory_query = '''
+cursor.execute('''
 CREATE TABLE IF NOT EXISTS DimCategory (
     CategoryKey INTEGER PRIMARY KEY,
     CategoryName TEXT
 )
-'''
-cursor.execute(create_dimcategory_query)
-
-# Insert data into DimCategory table
+''')
 DimCategory_df.to_sql("DimCategory", con, if_exists='replace', index=False)
+cursor.execute("SELECT * FROM DimCategory LIMIT 5")
+print("First 5 rows in DimCategory:", cursor.fetchall())
 
-# Query: Retrieve first 5 rows from DimCategory
-query = "SELECT * FROM DimCategory LIMIT 5"
-cursor.execute(query)
-dimcategory_rows = cursor.fetchall()
-print("First 5 rows in DimCategory:")
-for row in dimcategory_rows:
-    print(row)
-
-# Task 3: Load data into the DimCountry table
-dimcountry_path = "/Users/god/Downloads/DimCountry.csv"
+# --- Task 3: Load DimCountry ---
+dimcountry_path = os.path.join(DATA_DIR, "DimCountry.csv")
 DimCountry_df = pd.read_csv(dimcountry_path)
-
-# Create the DimCountry table if it doesn't exist
-create_dimcountry_query = '''
+cursor.execute('''
 CREATE TABLE IF NOT EXISTS DimCountry (
     CountryKey INTEGER PRIMARY KEY,
     CountryName TEXT
 )
-'''
-cursor.execute(create_dimcountry_query)
-
-# Insert data into DimCountry table
+''')
 DimCountry_df.to_sql("DimCountry", con, if_exists='replace', index=False)
+cursor.execute("SELECT * FROM DimCountry LIMIT 5")
+print("First 5 rows in DimCountry:", cursor.fetchall())
 
-# Query: Retrieve first 5 rows from DimCountry
-query = "SELECT * FROM DimCountry LIMIT 5"
-cursor.execute(query)
-dimcountry_rows = cursor.fetchall()
-print("First 5 rows in DimCountry:")
-for row in dimcountry_rows:
-    print(row)
-
-# Task 4: Load data into the FactSales table
-factsales_path = "/Users/god/Downloads/FactSales.csv"
+# --- Task 4: Load FactSales ---
+factsales_path = os.path.join(DATA_DIR, "FactSales.csv")
 FactSales_df = pd.read_csv(factsales_path)
-
-# Create the FactSales table if it doesn't exist
-create_factsales_query = '''
+cursor.execute('''
 CREATE TABLE IF NOT EXISTS FactSales (
     SalesKey INTEGER PRIMARY KEY,
     DateKey INTEGER,
@@ -113,80 +84,35 @@ CREATE TABLE IF NOT EXISTS FactSales (
     FOREIGN KEY (DateKey) REFERENCES DimDate(DateKey),
     FOREIGN KEY (CustomerKey) REFERENCES DimCountry(CountryKey)
 )
-'''
-cursor.execute(create_factsales_query)
-
-# Insert data into FactSales table
+''')
 FactSales_df.to_sql("FactSales", con, if_exists='replace', index=False)
+cursor.execute("SELECT * FROM FactSales LIMIT 5")
+print("First 5 rows in FactSales:", cursor.fetchall())
 
-# Query: Retrieve first 5 rows from FactSales
-query = "SELECT * FROM FactSales LIMIT 5"
-cursor.execute(query)
-factsales_rows = cursor.fetchall()
-print("First 5 rows in FactSales:")
-for row in factsales_rows:
-    print(row)
-
-# Task 5: Create a grouping sets query
-grouping_sets_query = '''
+# --- Task 5: Grouping Sets ---
+cursor.execute('''
 SELECT CountryName, CategoryName, SUM(SalesAmount) AS TotalSales
 FROM FactSales
 JOIN DimCountry ON FactSales.CustomerKey = DimCountry.CountryKey
 JOIN DimCategory ON FactSales.ProductKey = DimCategory.CategoryKey
 GROUP BY GROUPING SETS ((CountryName), (CategoryName), (CountryName, CategoryName))
-'''
-cursor.execute(grouping_sets_query)
-groupingsets_rows = cursor.fetchall()
-print("Grouping Sets Query Result:")
-for row in groupingsets_rows:
-    print(row)
+''')
+print("Grouping Sets Query Result:", cursor.fetchall())
 
-# Task 6: Create a rollup query
-rollup_query = '''
+# --- Task 6: Rollup ---
+cursor.execute('''
 SELECT Year, CountryName, SUM(SalesAmount) AS TotalSales
 FROM FactSales
 JOIN DimCountry ON FactSales.CustomerKey = DimCountry.CountryKey
 JOIN DimDate ON FactSales.DateKey = DimDate.DateKey
 GROUP BY ROLLUP (Year, CountryName)
-'''
-cursor.execute(rollup_query)
-rollup_rows = cursor.fetchall()
-print("Rollup Query Result:")
-for row in rollup_rows:
-    print(row)
+''')
+print("Rollup Query Result:", cursor.fetchall())
 
-# Task 7: Create a cube query
-cube_query = '''
+# --- Task 7: Cube ---
+cursor.execute('''
 SELECT Year, CountryName, AVG(SalesAmount) AS AverageSales
 FROM FactSales
 JOIN DimCountry ON FactSales.CustomerKey = DimCountry.CountryKey
-JOIN DimDate ON FactSales.DateKey = DimDate.DateKey
-GROUP BY CUBE (Year, CountryName)
-'''
-cursor.execute(cube_query)
-cube_rows = cursor.fetchall()
-print("Cube Query Result:")
-for row in cube_rows:
-    print(row)
+JOIN DimDate ON FactSales.Date
 
-# Task 8: Create an MQT
-create_mqt_query = '''
-CREATE TABLE IF NOT EXISTS total_sales_per_country AS
-SELECT CountryName, SUM(SalesAmount) AS TotalSales
-FROM FactSales
-JOIN DimCountry ON FactSales.CustomerKey = DimCountry.CountryKey
-GROUP BY CountryName
-'''
-cursor.execute(create_mqt_query)
-con.commit()
-
-# Query: Retrieve data from total_sales_per_country
-query = "SELECT * FROM total_sales_per_country"
-cursor.execute(query)
-mqt_rows = cursor.fetchall()
-print("Total Sales Per Country MQT:")
-for row in mqt_rows:
-    print(row)
-
-# Close the connection
-con.close()
